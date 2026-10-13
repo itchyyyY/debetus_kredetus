@@ -17,7 +17,7 @@ public class Radio : MonoBehaviour, IInteractable, ITurnOffable
     [SerializeField] private bool _loopSingleTrack = false;
 
     [Header("Подсказки для экрана")]
-    [SerializeField] private string _turnOnPrompt = "Включить радио (E)";
+    [SerializeField] private string _turnOnPrompt = "Включить радио [E]";
     [SerializeField] private string _emptyPrompt = "В радио нет треков";
 
     private AudioSource _audioSource;
@@ -36,7 +36,7 @@ public class Radio : MonoBehaviour, IInteractable, ITurnOffable
                 return _turnOnPrompt;
 
             int currentNum = _currentTrackIndex + 1;
-            return $"След. трек [{currentNum}/{_tracks.Length}] (E) | Выключить (R)";
+            return $"След. трек [{currentNum}/{_tracks.Length}] [E]\nВыключить радио [R]";
         }
     }
 
@@ -97,7 +97,6 @@ public class Radio : MonoBehaviour, IInteractable, ITurnOffable
         _currentTrackIndex = -1;
         _audioSource.Stop();
         _audioSource.clip = null;
-        Debug.Log("[Radio] Радио выключено");
     }
 
     private void PlayCurrentTrack()
@@ -115,7 +114,5 @@ public class Radio : MonoBehaviour, IInteractable, ITurnOffable
         _audioSource.loop = _loopSingleTrack;
         _audioSource.volume = _volume;
         _audioSource.Play();
-
-        Debug.Log($"[Radio] Играет трек [{_currentTrackIndex + 1}/{_tracks.Length}]: {clipToPlay.name}");
     }
 }

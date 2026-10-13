@@ -6,13 +6,14 @@ using UnityEngine;
 public class PickableItem : MonoBehaviour, IInteractable
 {
     [Header("Настройки подсказки")]
-    [SerializeField] private string _promptMessage = "Подобрать (E)";
+    [SerializeField] private string _promptMessage = "Подобрать [E]";
 
     [Header("Слой при удержании")]
     [SerializeField] private string _heldLayerName = "HeldItem";
 
     private Rigidbody _rb;
     private Collider _col;
+    private RigidbodyInterpolation _originalInterpolation;
     private readonly Dictionary<Transform, int> _originalLayers = new Dictionary<Transform, int>();
 
     public string PromptMessage => _promptMessage;
@@ -21,6 +22,10 @@ public class PickableItem : MonoBehaviour, IInteractable
     {
         _rb = GetComponent<Rigidbody>();
         _col = GetComponent<Collider>();
+        if (_rb != null)
+        {
+            _originalInterpolation = _rb.interpolation;
+        }
     }
 
     public void Interact(PlayerInteraction player)
@@ -30,8 +35,17 @@ public class PickableItem : MonoBehaviour, IInteractable
 
     public void PickUp(Transform holdPoint, string customHeldLayer = null)
     {
-        _rb.isKinematic = true;     // Отключаем гравитацию и физику
-        _col.enabled = false;        // Отключаем коллайдер, чтобы не толкать игрока изнутри
+        if (_rb != null)
+        {
+            _originalInterpolation = _rb.interpolation;
+            _rb.interpolation = RigidbodyInterpolation.None; // Отключаем интерполяцию, чтобы кубик следовал за рукой
+            _rb.isKinematic = true;     // Отключаем гравитацию и физику
+        }
+
+        if (_col != null)
+        {
+            _col.enabled = false;        // Отключаем коллайдер, чтобы не толкать игрока изнутри
+        }
 
         transform.SetParent(holdPoint);
         transform.localPosition = Vector3.zero;
@@ -46,11 +60,19 @@ public class PickableItem : MonoBehaviour, IInteractable
         RestoreOriginalLayers();
 
         transform.SetParent(null);
-        _rb.isKinematic = false;     // Включаем физику обратно
-        _col.enabled = true;         // Включаем коллайдер
 
-        _rb.linearVelocity = Vector3.zero;
-        _rb.AddForce(throwForce, ForceMode.Impulse); // Бросаем вперед
+        if (_rb != null)
+        {
+            _rb.isKinematic = false;     // Включаем физику обратно
+            _rb.interpolation = _originalInterpolation; // Возвращаем интерполяцию для плавного полета
+            _rb.linearVelocity = Vector3.zero;
+            _rb.AddForce(throwForce, ForceMode.Impulse); // Бросаем вперед
+        }
+
+        if (_col != null)
+        {
+            _col.enabled = true;         // Включаем коллайдер
+        }
     }
 
     private void SetHeldLayer(string layerName)

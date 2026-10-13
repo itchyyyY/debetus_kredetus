@@ -20,8 +20,8 @@ public class Door : MonoBehaviour, IInteractable
     [SerializeField] private float _speed = 2.5f;
 
     [Header("Подсказки для экрана")]
-    [SerializeField] private string _openPrompt = "Открыть дверь (E)";
-    [SerializeField] private string _closePrompt = "Закрыть дверь (E)";
+    [SerializeField] private string _openPrompt = "Открыть дверь [E]";
+    [SerializeField] private string _closePrompt = "Закрыть дверь [E]";
 
     private bool _isOpen = false;
     private float _currentProgress = 0f; // 0 = закрыта, 1 = открыта
@@ -109,7 +109,6 @@ public class Door : MonoBehaviour, IInteractable
     public void ToggleDoor()
     {
         _isOpen = !_isOpen;
-        Debug.Log($"[Door] Дверь: {(_isOpen ? "ОТКРЫВАЕТСЯ" : "ЗАКРЫВАЕТСЯ")}");
     }
 
     // Визуализация оси петли в окне Scene
